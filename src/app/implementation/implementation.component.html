@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flujo Maximo</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+</head>
+
+<body>
+
+  <div class="mt-5" style="margin-left: auto; margin-right: auto; width: 35%;">
+
+    <div class="card" style="width: 100%">
+      <div class="card-body">
+        <h5 class="card-title" style="text-align: center;">Algoritmo de Flujo Máximo - Ford Fulkerson</h5>
+
+        <div class=" mt-2">
+          <div class="mt-2">
+            <label for="nodesQty" class="form-label">Cantidad de nodos: </label>
+            <input id="nodesQty" type="number" class="form-control" [(ngModel)]="nodesQty"
+              placeholder="Cantidad de nodos de la red">
+          </div>
+
+          <div class="mt-2">
+            <label for="start" class="form-label">Nodo inicial: </label>
+            <input id="start" type="number" class="form-control" [(ngModel)]="start"
+              placeholder="Se comienza por el nodo '0' (cero)">
+          </div>
+
+          <div class="mt-2">
+            <label for="end" class="form-label">Nodo final: </label>
+            <input id="end" type="number" class="form-control" [(ngModel)]="end"
+              placeholder="Ultimo nodo igual a la cant. menos uno" data-toggle="tooltip" data-placement="top"
+              title="Tooltip on top">
+          </div>
+
+          <div class="d-grid gap-2 mt-2">
+            <button class="btn btn-primary" (click)="validateInput()">Validar nodos</button>
+          </div>
+
+        </div>
+
+        <p *ngIf="error" class="mt-2">{{error}}</p>
+
+        <div *ngIf="nodesData.length > 0 && !error" class="table-responsive">
+
+          <p class="mt-2">Introducir los valores correspondientes a los flujos entre nodos:</p>
+
+          <table class="table" style="text-align: center;">
+            <tr>
+              <th>Or./Ds.</th>
+              <th *ngFor="let node of nodes; index as i">
+                {{i}}
+              </th>
+            </tr>
+            <tr *ngFor="let node of nodes; index as i">
+              <th>{{i}}</th>
+              <td *ngFor="let n of node; index as j">
+                <input class="form-control form-control-sm" type="number" [(ngModel)]="n"
+                  (keypress)="changeValue($event.key, i, j)" />
+              </td>
+            </tr>
+          </table>
+        </div>
+
+        <div *ngIf="nodesData.length > 0" class="d-grid gap-2 mt-2">
+
+          <button class="btn btn-primary mt-2" (click)="apply()">Obtener Flujo Máximo</button>
+
+          <div *ngIf="flujoMax">
+
+            <p class="mt-2">Flujo Máximo obtenido: {{flujoMax}}</p>
+
+            <div *ngFor="let pf of path_flows; index as i">
+              <p>K obtenida en la iteracion {{i + 1}}: {{pf}}</p>
+              <p>Camino recorrido en la iteracion {{i + 1}}: {{all_parents[i]}} </p>
+            </div>
+
+            <p>Red residual final:</p>
+
+            <table class="table">
+              <tr>
+                <th>Or./Ds.</th>
+                <th *ngFor="let node of rGraph; index as i">
+                  {{i}}
+                </th>
+              </tr>
+              <tr *ngFor="let i of rGraph; index as x">
+                <th>{{x}}</th>
+                <td *ngFor="let j of i; index as y">
+                  {{j}}
+                </td>
+              </tr>
+            </table>
+
+          </div>
+
+          <div  class="d-grid gap-2 mt-2">
+            <button (click)="seeGraph()" class="btn btn-primary mt-2">Ver garfico</button>
+          </div>
+          
+          <div *ngIf="nodesGraph.length > 0">
+            <div id="graph" ></div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+
+  
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
+    crossorigin="anonymous"></script>
+</body>
+
+</html>
