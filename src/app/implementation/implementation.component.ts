@@ -32,7 +32,7 @@ export class ImplementationComponent implements OnInit {
   start: Number;
   end: Number;
   flujoMax: Number;
-  all_parents = new Array<Array<Number>>();
+  all_parents = new Array<Array<Number>>([]);
   path_flows = new Array<Number>();
   rGraph = new Array<Array<Number>>();
   nodesGraph = new Array<graphNode>();
@@ -135,7 +135,7 @@ export class ImplementationComponent implements OnInit {
     // 's' to sink 't' in residual graph. Also
     // fills parent[] to store the path
     function bfs(rGraph, s, t, parent) {
-
+      debugger;
       // Create a visited array and mark all
       // vertices as not visited
       let visited = new Array(V);
@@ -162,6 +162,7 @@ export class ImplementationComponent implements OnInit {
             // anymore We just have to set its parent
             // and can return true
             if (v == t) {
+              debugger;
               parent[v] = u;
               return true;
             }
@@ -216,6 +217,9 @@ export class ImplementationComponent implements OnInit {
       // is path from source to sink
       while (bfs(rGraph, s, t, parent)) {
 
+        console.log('parent ', parent);
+        console.log('s ', s);
+        console.log('t ', t);
         // Store path in array
         all_parents.push(parent);
 
@@ -243,8 +247,6 @@ export class ImplementationComponent implements OnInit {
         // Add path flow to overall flow
         max_flow += path_flow;
       }
-
-      console.log('Sumatoria: ', path_flows);
 
       console.log('Residual: ', rGraph);
 

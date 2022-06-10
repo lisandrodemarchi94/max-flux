@@ -60,7 +60,7 @@
             <tr *ngFor="let node of nodes; index as i">
               <th>{{i}}</th>
               <td *ngFor="let n of node; index as j">
-                <input class="form-control form-control-sm" type="number" [(ngModel)]="n"
+                <input class="form-control form-control-sm" type="number"
                   (keypress)="changeValue($event.key, i, j)" />
               </td>
             </tr>
