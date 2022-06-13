@@ -32,11 +32,10 @@ export class ImplementationComponent implements OnInit {
   start: Number;
   end: Number;
   flujoMax: Number;
-  all_parents = new Array<Array<Number>>([]);
+  all_parents = new Array<String>();
   path_flows = new Array<Number>();
   rGraph = new Array<Array<Number>>();
-  nodesGraph = new Array<graphNode>();
-  links = new Array<graphLink>();
+  isGraphActive: boolean = false;
 
   constructor() { }
 
@@ -59,17 +58,6 @@ export class ImplementationComponent implements OnInit {
       this.nodes = [];
     }
 
-    for (let i = 0; i < this.nodesQty; i++) {
-      const node: graphNode = {
-        id: String(i),
-        name: String(i),
-        val: 1,
-        label: String(i)
-      };
-      this.nodesGraph.push(node);
-    }
-    console.log(this.nodesGraph);
-
     for (let i = 0; i <= this.nodesQty - 1; i++) {
       let row: Number[] = new Array<Number>();
       for (let j = 0; j <= this.nodesQty - 1; j++) {
@@ -86,41 +74,51 @@ export class ImplementationComponent implements OnInit {
   }
 
   seeGraph() {
+
+    this.isGraphActive = true;
+
     let graph = document.getElementById("graph");
     const myGraph = ForceGraph();
-    let dataGraph: dataGraphFormat = {
+    
+     let dataGraph: dataGraphFormat = {
       links: [],
       nodes: []
     };
 
     // Fill nodes
-    this.nodesGraph.forEach(node => {
+    for (let i = 0; i < this.nodesQty; i++) {
+      const node: graphNode = {
+        id: String(i),
+        name: String(i + 1),
+        val: 1,
+        label: String(i + 1)
+      };
       dataGraph.nodes.push(node);
-    });
-
+    }
+   
     // Fill links
+    let link: any = null;
     this.rGraph.forEach((nodes, i) => {
       nodes.forEach((node, j) => {
         if (node !== 0) {
-          const link = {
+          link = {
             source: String(i),
-            target: String(j)
+            target: String(j),
+            label:  String(i + 1) + ' -- ' + String(j + 1) + ': ' + String(node)
           };
-          this.links.push(link);
+          dataGraph.links.push(link);
         }
       });
     });
 
-    this.links.forEach(link => {
-      dataGraph.links.push(link);
-    });
+    console.log(dataGraph);
 
     myGraph(graph)
       .graphData(dataGraph)
       .width(350)
       .height(350)
       .linkLabel((link: any): string => {
-        return (link.source.id.toString() + ' -- ' + link.target.id.toString())
+        return (link.label)
       });
   }
 
@@ -135,7 +133,6 @@ export class ImplementationComponent implements OnInit {
     // 's' to sink 't' in residual graph. Also
     // fills parent[] to store the path
     function bfs(rGraph, s, t, parent) {
-      debugger;
       // Create a visited array and mark all
       // vertices as not visited
       let visited = new Array(V);
@@ -162,7 +159,6 @@ export class ImplementationComponent implements OnInit {
             // anymore We just have to set its parent
             // and can return true
             if (v == t) {
-              debugger;
               parent[v] = u;
               return true;
             }
@@ -205,7 +201,7 @@ export class ImplementationComponent implements OnInit {
       let parent = new Array(V);
 
       // To store paths along the iterations
-      let all_parents = new Array<Array<Number>>();
+      let all_parents = new Array<String>();
 
       // There is no flow initially
       let max_flow = 0;
@@ -213,24 +209,28 @@ export class ImplementationComponent implements OnInit {
       // To store flow quantities in each iteration 
       let path_flows = new Array<Number>();
 
+      // To store the nodes of the way and do not repeat the numbers
+      let setPaths = new Set<Number>();
+
+      // Use to convert previously Set in array and reverse it
+      let pahtIteration: Number[] = [];
+
       // Augment the flow while tere
       // is path from source to sink
       while (bfs(rGraph, s, t, parent)) {
-
-        console.log('parent ', parent);
-        console.log('s ', s);
-        console.log('t ', t);
-        // Store path in array
-        all_parents.push(parent);
 
         // Find minimum residual capacity of the edhes
         // along the path filled by BFS. Or we can say
         // find the maximum flow through the path found.
         let path_flow = Number.MAX_VALUE;
+
         for (v = t; v != s; v = parent[v]) {
           u = parent[v];
           path_flow = Math.min(path_flow,
             rGraph[u][v]);
+          // Store into the set the numbers of the nodes in the path
+          setPaths.add(v + 1);
+          setPaths.add(u + 1);
         }
 
         // Update residual capacities of the edges and
@@ -244,21 +244,30 @@ export class ImplementationComponent implements OnInit {
         // Store path flow in array
         path_flows.push(path_flow);
 
+        // Converte Set in array to store the path
+        setPaths.forEach((entry: Number) => {
+          pahtIteration.push(entry);
+        });
+
+        // Store the iteration path in array
+        all_parents.push(pahtIteration.reverse().toString());
+
+        // Clean or reset the Set and array
+        setPaths.clear();
+        pahtIteration = [];
+
         // Add path flow to overall flow
         max_flow += path_flow;
       }
 
-      console.log('Residual: ', rGraph);
-
       // Return the overall flow
       return { max_flow, path_flows, all_parents, rGraph };
     }
-    
+
     let result = fordFulkerson(this.nodesData, this.start, this.end);
     this.flujoMax = result.max_flow;
     this.all_parents = result.all_parents;
     this.path_flows = result.path_flows;
-    console.log(result.rGraph);
     this.rGraph = result.rGraph;
   }
 
