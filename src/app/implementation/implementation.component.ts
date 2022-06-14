@@ -35,7 +35,6 @@ export class ImplementationComponent implements OnInit {
   all_parents = new Array<String>();
   path_flows = new Array<Number>();
   rGraph = new Array<Array<Number>>();
-  isGraphActive: boolean = false;
 
   constructor() { }
 
@@ -74,9 +73,6 @@ export class ImplementationComponent implements OnInit {
   }
 
   seeGraph() {
-
-    this.isGraphActive = true;
-
     let graph = document.getElementById("graph");
     const myGraph = ForceGraph();
     
@@ -110,8 +106,6 @@ export class ImplementationComponent implements OnInit {
         }
       });
     });
-
-    console.log(dataGraph);
 
     myGraph(graph)
       .graphData(dataGraph)
