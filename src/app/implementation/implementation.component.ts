@@ -69,7 +69,14 @@ export class ImplementationComponent implements OnInit {
   }
 
   changeValue(newValue, i, j) {
-    this.nodesData[i][j] = Number(newValue);
+
+    if (this.nodesData[i][j] === 0) {
+      this.nodesData[i][j] = Number(newValue);
+    } else {
+      let value = String(this.nodesData[i][j]).concat(String(newValue));
+      this.nodesData[i][j] = Number(value);
+    };
+    
   }
 
   seeGraph() {
